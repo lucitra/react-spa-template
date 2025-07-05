@@ -1,0 +1,44 @@
+name: Customize Template
+
+on:
+  workflow_dispatch:
+    inputs:
+      author_name:
+        description: 'Your name'
+        required: true
+        type: string
+      author_email:
+        description: 'Your email'
+        required: true
+        type: string
+
+jobs:
+  customize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Customize
+        run: |
+          # Update package.json
+          sed -i "s/Your Name/${{ inputs.author_name }}/g" package.json
+          sed -i "s/your.email@example.com/${{ inputs.author_email }}/g" package.json
+          sed -i "s/lucitra/${{ github.repository_owner }}/g" package.json README.md
+          sed -i "s/react-spa-template/${{ github.event.repository.name }}/g" package.json README.md
+          
+          # Update LICENSE
+          sed -i "s/React SPA Template Contributors/${{ inputs.author_name }}/g" LICENSE
+          
+          # Create .env from example
+          cp .env.example .env
+      
+      - name: Commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "Customize template for ${{ inputs.author_name }}"
+          git push

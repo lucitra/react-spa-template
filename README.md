@@ -2,6 +2,8 @@
 
 A production-ready React Single Page Application template featuring modern development practices, internationalization, and comprehensive tooling.
 
+> 🤖 **GitHub UI Setup**: After creating your repository from this template, you'll be prompted to run a simple setup workflow through the GitHub UI to customize it for your project!
+
 ## 🚀 Features
 
 ### Core Technologies
@@ -62,13 +64,13 @@ src/
 1. **Use this template** (if using as GitHub template)
    ```bash
    # Click "Use this template" on GitHub, then clone your new repo
-   git clone https://github.com/yourusername/your-new-project.git
+   git clone https://github.com/lucitra/your-new-project.git
    cd your-new-project
    ```
 
 2. **Or clone directly**
    ```bash
-   git clone https://github.com/yourusername/react-spa-template.git
+   git clone https://github.com/lucitra/react-spa-template.git
    cd react-spa-template
    ```
 
@@ -87,6 +89,17 @@ src/
    ```bash
    npm run dev
    ```
+
+### 🎯 Template Setup
+
+After creating your repository from this template:
+
+1. Go to **Actions** → **Customize Template**
+2. Click **"Run workflow"**  
+3. Enter your **name** and **email**
+4. Click **"Run workflow"** (green button)
+
+Done! Your template is now customized.
 
 ## 📜 Available Scripts
 

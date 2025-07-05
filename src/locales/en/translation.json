@@ -1,0 +1,13 @@
+{
+  "welcome": "Hello World",
+  "language": "Language",
+  "selectLanguage": "Select Language",
+  "app": {
+    "description": "This is a React SPA template with best practices."
+  },
+  "error": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. Please try refreshing the page.",
+    "reload": "Reload page"
+  }
+}

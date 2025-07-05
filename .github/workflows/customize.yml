@@ -11,6 +11,11 @@ on:
         description: 'Your email'
         required: true
         type: string
+      original_owner:
+        description: 'Original template owner (leave blank if using lucitra/react-spa-template)'
+        required: false
+        type: string
+        default: 'lucitra'
 
 jobs:
   customize:
@@ -23,10 +28,13 @@ jobs:
       
       - name: Customize
         run: |
+          # Use provided original owner or default to lucitra
+          ORIGINAL_OWNER="${{ inputs.original_owner || 'lucitra' }}"
+          
           # Update package.json
           sed -i "s/Your Name/${{ inputs.author_name }}/g" package.json
           sed -i "s/your.email@example.com/${{ inputs.author_email }}/g" package.json
-          sed -i "s/lucitra/${{ github.repository_owner }}/g" package.json README.md
+          sed -i "s/${ORIGINAL_OWNER}/${{ github.repository_owner }}/g" package.json README.md
           sed -i "s/react-spa-template/${{ github.event.repository.name }}/g" package.json README.md
           
           # Update LICENSE

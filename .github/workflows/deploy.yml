@@ -1,0 +1,98 @@
+name: Deploy React SPA to Pages
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  # Check if GitHub Pages is enabled
+  check-pages:
+    runs-on: ubuntu-latest
+    outputs:
+      pages-enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - name: Check if Pages is enabled
+        id: check
+        run: |
+          # Try to get Pages info, if it fails, Pages is not enabled
+          if gh api repos/${{ github.repository }}/pages 2>/dev/null; then
+            echo "enabled=true" >> $GITHUB_OUTPUT
+          else
+            echo "enabled=false" >> $GITHUB_OUTPUT
+            echo "::notice::GitHub Pages is not enabled. Skipping deployment."
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+  
+  build:
+    needs: check-pages
+    if: needs.check-pages.outputs.pages-enabled == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: |
+          # Extract repository name and set base path for GitHub Pages
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          echo "Repository name: $REPO_NAME"
+          
+          # Build with correct base path for GitHub Pages
+          npm run build -- --base="/$REPO_NAME/"
+          
+          # Verify the build output exists
+          if [ ! -d "dist" ]; then
+            echo "Error: dist directory not found after build"
+            exit 1
+          fi
+          
+          if [ ! -f "dist/index.html" ]; then
+            echo "Error: index.html not found in dist directory"
+            exit 1
+          fi
+          
+          echo "Build output:"
+          ls -la dist/
+          echo "Checking index.html for correct base path:"
+          grep -n "src=" dist/index.html || true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: [check-pages, build]
+    if: needs.check-pages.outputs.pages-enabled == 'true'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

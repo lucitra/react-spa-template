@@ -101,6 +101,8 @@ After creating your repository from this template:
 
 Done! Your template is now customized.
 
+**Optional:** Enable GitHub Pages in Settings → Pages → Source: "GitHub Actions" to automatically deploy your app.
+
 ## 📜 Available Scripts
 
 ```bash
@@ -273,10 +275,10 @@ git commit -m "fix stuff"
 
 ## 🚀 Deployment
 
-### GitHub Pages
-1. Update `vite.config.js` base path if needed
-2. Build: `npm run build`
-3. Deploy `dist/` folder to GitHub Pages
+### GitHub Pages (Automatic)
+- Deploys automatically on every push to `main`
+- Available at: `https://yourusername.github.io/your-repo-name/`
+- Customize workflow automatically configures the base path
 
 ### Vercel/Netlify
 1. Connect your repository

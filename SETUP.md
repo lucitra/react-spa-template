@@ -39,7 +39,11 @@ To convert to TypeScript:
 ## Deployment
 
 ### GitHub Pages
-Set `base: '/your-repo-name/'` in `vite.config.js`
+1. The base path in `vite.config.js` is automatically configured when you run the customize workflow
+2. Enable GitHub Pages in your repository:
+   - Go to Settings → Pages
+   - Source: GitHub Actions
+3. The app will automatically deploy on every push to `main`
 
 ### Vercel/Netlify
 Zero configuration needed - just connect your repository.

@@ -94,6 +94,11 @@ src/
 
 After creating your repository from this template:
 
+**⚡ Quick Setup - Click the button below to customize your template:**
+
+[![Run Customize Workflow](https://img.shields.io/badge/🔧_Customize_Template-Run_Workflow-blue?style=for-the-badge)](../../actions/workflows/customize.yml)
+
+**Manual Steps:**
 1. Go to **Actions** → **Customize Template**
 2. Click **"Run workflow"**  
 3. Enter your **name** and **email**

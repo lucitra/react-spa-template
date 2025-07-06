@@ -1,0 +1,136 @@
+name: Setup Reminder
+
+on:
+  create:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '.github/workflows/setup-reminder.yml'
+
+jobs:
+  create-setup-issue:
+    runs-on: ubuntu-latest
+    if: github.repository != 'lucitra/react-spa-template'
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check if template has been customized
+        id: check-customized
+        run: |
+          if grep -q "Your Name" package.json; then
+            echo "customized=false" >> $GITHUB_OUTPUT
+          else
+            echo "customized=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create setup reminder issue
+        if: steps.check-customized.outputs.customized == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'setup-reminder'
+            });
+            
+            if (existingIssues.length > 0) {
+              console.log('Setup reminder issue already exists');
+              return;
+            }
+            
+            const lines = [
+              '# 🎯 Welcome to your new React SPA!',
+              '',
+              'Thanks for using the React SPA Template! To get started, you need to customize this template with your information.',
+              '',
+              '## ⚡ Quick Setup (Recommended)',
+              '',
+              'Click the button below to automatically customize your template:',
+              '',
+              `[![Run Customize Workflow](https://img.shields.io/badge/🔧_Customize_Template-Run_Workflow-blue?style=for-the-badge)](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/workflows/customize.yml)`,
+              '',
+              '**What this does:**',
+              '- Updates your name and email in `package.json`',
+              '- Replaces template repository references with your repository',
+              '- Updates license copyright information',
+              '- Creates a `.env` file from the example',
+              '',
+              '## 📋 Manual Steps (Alternative)',
+              '',
+              'If you prefer to do it manually:',
+              '',
+              '1. **Go to Actions** → **Customize Template**',
+              '2. **Click "Run workflow"**',
+              '3. **Enter your name and email**',
+              '4. **Click "Run workflow"** (green button)',
+              '',
+              '## 🚀 Optional: Enable GitHub Pages',
+              '',
+              'To automatically deploy your app:',
+              '1. Go to **Settings** → **Pages**',
+              '2. Set **Source** to "GitHub Actions"',
+              '3. Your app will deploy automatically on every push to `main`',
+              '',
+              '## ✅ After Setup',
+              '',
+              'Once you have customized your template:',
+              '- [ ] Update `README.md` with your project details',
+              '- [ ] Replace `public/favicon.ico` with your icon',
+              '- [ ] Configure `.env` with your settings',
+              '- [ ] Start building your awesome React app!',
+              '',
+              '---',
+              '',
+              '**Need help?** Check out the [README.md](./README.md) for detailed documentation.',
+              '',
+              '*This issue will automatically close when you run the customize workflow.*'
+            ];
+            const issueBody = lines.join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🎯 Welcome! Please customize your template',
+              body: issueBody,
+              labels: ['setup-reminder', 'good first issue']
+            });
+            
+            console.log('Setup reminder issue created successfully!');
+      
+      - name: Close setup reminder if customized
+        if: steps.check-customized.outputs.customized == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'setup-reminder'
+            });
+            
+            for (const issue of issues) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: '🎉 **Template customized successfully!**\n\nYour React SPA template has been customized. Happy coding! 🚀'
+              });
+              
+              console.log(`Closed setup reminder issue #${issue.number}`);
+            }

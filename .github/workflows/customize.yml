@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
     
     steps:
       - uses: actions/checkout@v4
@@ -56,3 +57,32 @@ jobs:
           git add -A
           git commit -m "Customize template for ${{ inputs.author_name }}"
           git push
+      
+      - name: Close setup reminder issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'setup-reminder'
+            });
+            
+            for (const issue of issues) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `🎉 **Template customized successfully!**\n\n✅ The following settings have been updated:\n- **Author**: ${{ inputs.author_name }}\n- **Email**: ${{ inputs.author_email }}\n- **Repository**: ${context.repo.owner}/${context.repo.repo}\n- **License**: Copyright updated to ${{ inputs.author_name }}\n- **Environment**: .env file created from template\n\nYour React SPA template is now ready! Happy coding! 🚀`
+              });
+              
+              console.log(`Closed setup reminder issue #${issue.number}`);
+            }

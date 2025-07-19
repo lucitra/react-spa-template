@@ -56,6 +56,38 @@ npm run lint
 - **Path Aliases**: `@/`, `@components/`, `@locales/`, `@config/` configured
 - **Conventional Commits**: Enforced via commitlint and pre-commit hooks
 
+## Commit Message Guidelines
+
+**IMPORTANT**: All commit messages MUST follow these rules:
+
+### Format
+```
+<type>: <subject>
+```
+
+### Rules
+1. **Type**: Must be one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+2. **Subject**: 
+   - **MUST be all lowercase** (except proper nouns like React, GitHub, etc.)
+   - No period at the end
+   - Max 100 characters
+   - Imperative mood ("add" not "adds" or "added")
+
+### Examples
+✅ **Correct:**
+```
+feat: add user authentication
+fix: resolve memory leak in component
+docs: update readme with new examples
+```
+
+❌ **Incorrect:**
+```
+feat: Add user authentication     # Wrong: Capital 'A'
+fix: resolved memory leak.        # Wrong: Past tense and period
+docs: Update README              # Wrong: Capital 'U'
+```
+
 ## Template-Specific Guidelines
 
 ### When working with this template:
